@@ -32,18 +32,14 @@ import { buildDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as ComponentOptions, Style } from './schema';
 
 function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFile {
-  const text = host.read(modulePath);
-  if (text === null) {
-    throw new SchematicsException(`File ${modulePath} does not exist.`);
-  }
-  const sourceText = text.toString('utf-8');
+  const sourceText = host.readText(modulePath);
 
   return ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
 }
 
 function addDeclarationToNgModule(options: ComponentOptions): Rule {
   return (host: Tree) => {
-    if (options.skipImport || !options.module) {
+    if (options.skipImport || options.standalone || !options.module) {
       return host;
     }
 
